@@ -84,8 +84,8 @@ services:
             - /var/www/html/modules
             - /var/www/private
         environment:
-            MYSQL_ROOT_PASSWORD: cokgizlisifre
-            MYSQL_DATABASE: wordpress
+            MYSQL_PASSWORD: birikiuc123!
+            MYSQL_DATABASE: drupal
             MYSQL_USER: murataksu
         deploy:
             replicas: 3
@@ -94,11 +94,15 @@ services:
             - backend
 #Visualizer
     visualizer:
-        image: dockersamples/visualizer:stable
-        ports:
-        - "8081:8080"
+        image: dockersamples/visualizer
         volumes:
-        - "/var/run/docker.sock:/var/run/docker.sock"
+            - type: bind
+              source: /var/run/docker.sock
+              target: /var/run/docker.sock        
+        ports:
+            - "6080:8080"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
         deploy:
             placement:
                 constraints: [node.role == manager]
