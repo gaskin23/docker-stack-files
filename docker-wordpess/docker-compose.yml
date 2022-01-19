@@ -7,10 +7,10 @@ services:
             - db-data:/var/lib/mysql
         restart: always
         environment:
-            MYSQL_ROOT_PASSWORD: cokgizlisifre
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_passwd
             MYSQL_DATABASE: wordpress
-            MYSQL_USER: murataksu
-            MYSQL_PASSWORD: birikiuc123!
+            MYSQL_USER_FILE: /run/secrets/mysql_user
+            MYSQL_PASSWORD_FILE: /run/secrets/mysql_passwd
         deploy:
             replicas: 1
             restart_policy:
@@ -33,8 +33,8 @@ services:
             - /var/www/html
         environment:
             WORDPRESS_DB_HOST: db:3306
-            WORDPRESS_DB_USER: murataksu
-            WORDPRESS_DB_PASSWORD: birikiuc123!
+            WORDPRESS_DB_USER_FILE: /run/secrets/mysql_user
+            WORDPRESS_DB_PASSWORD_FILE: /run/secrets/mysql_passwd
         deploy:
             replicas: 5
             update_config:
@@ -50,7 +50,7 @@ services:
             restart_policy:
                 condition: on-failure
             placement:
-                constraints: [node.role == worker]
+            constraints: [node.role == worker]
         networks:
             - frontend
             - backend
@@ -64,7 +64,7 @@ services:
             - "7080:80"
         environment:
             PMA_HOST: db
-            MYSQL_ROOT_PASSWORD: cokgizlisifre
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_passwd
         networks:
             - frontend
             - backend
@@ -84,9 +84,9 @@ services:
             - /var/www/html/modules
             - /var/www/private
         environment:
-            MYSQL_PASSWORD: birikiuc123!
-            MYSQL_DATABASE: drupal
-            MYSQL_USER: murataksu
+            MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mysql_root_passwd
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER_FILE: /run/secrets/mysql_user
         deploy:
             replicas: 3
         networks:
@@ -94,18 +94,14 @@ services:
             - backend
 #Visualizer
     visualizer:
-        image: dockersamples/visualizer
-        volumes:
-            - type: bind
-              source: /var/run/docker.sock
-              target: /var/run/docker.sock        
+        image: dockersamples/visualizer:stable
         ports:
-            - "6080:8080"
+        - "7080:8080"
         volumes:
-            - "/var/run/docker.sock:/var/run/docker.sock"
+        - "/var/run/docker.sock:/var/run/docker.sock"
         deploy:
-            placement:
-                constraints: [node.role == manager]
+        placement:
+            constraints: [node.role == manager]
 
 #Networks and Volumes
 
